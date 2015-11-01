@@ -323,6 +323,49 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 	G_FreeEdict (self);
 }
 
+//youken blaster_think
+void fire_blaster_think(edict_t *ent)
+{
+	edict_t *target = NULL;
+	edict_t *search = NULL;
+
+	vec3_t targetdir, searchdir;
+	vec_t speed;
+
+	while( (search=findradius(search,ent->s.origin, 1000)) != NULL ) {
+		if( !(search->svflags & SVF_MONSTER) && !search->client )
+			continue;
+		if( search == ent->owner )
+			continue;
+
+		if( !visible(ent, search) )
+			continue;
+		if( !infront(ent, search) )
+			continue;
+
+		VectorSubtract(search->s.origin, ent->s.origin, searchdir);
+
+		if( (target=NULL) || (VectorLength(searchdir) < VectorLength(targetdir)) ) {
+			target = search;
+			VectorCopy(searchdir,targetdir);
+		}
+	}
+
+	if( target != NULL ) {
+		VectorNormalize(targetdir);
+		VectorScale(targetdir, 0.2, targetdir);
+		VectorAdd(targetdir, ent->movedir, targetdir);
+		VectorNormalize(targetdir);
+		VectorCopy(targetdir, ent->movedir);
+		vectoangles(targetdir, ent->s.angles);
+		speed = VectorLength(ent->velocity);
+		VectorScale(targetdir, speed, ent->velocity);
+	}
+
+	ent->nextthink = level.time + .1;
+	return;
+}
+
 void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int effect, qboolean hyper)
 {
 	edict_t	*bolt;
@@ -351,8 +394,12 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 	bolt->s.sound = gi.soundindex ("misc/lasfly.wav");
 	bolt->owner = self;
 	bolt->touch = blaster_touch;
-	bolt->nextthink = level.time + 2;
-	bolt->think = G_FreeEdict;
+
+	//youken edit
+	bolt->nextthink = level.time + .1;
+	//bolt->think = G_FreeEdict;
+	bolt->think = fire_blaster_think;
+
 	bolt->dmg = damage;
 	bolt->classname = "bolt";
 	if (hyper)
