@@ -921,7 +921,8 @@ void bfg_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 	if (other->takedamage)
 		T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, 200, 0, 0, MOD_BFG_BLAST);
 	else
-		return;
+		return; //youken mod bfg keeps bouncing!!
+
 	T_RadiusDamage(self, self->owner, 200, other, 100, MOD_BFG_BLAST);
 
 	gi.sound (self, CHAN_VOICE, gi.soundindex ("weapons/bfg__x1b.wav"), 1, ATTN_NORM, 0);
@@ -1031,8 +1032,7 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	VectorCopy (dir, bfg->movedir);
 	vectoangles (dir, bfg->s.angles);
 	VectorScale (dir, speed, bfg->velocity);
-	//youken mod
-	bfg->movetype = MOVETYPE_REFLECT;
+	bfg->movetype = MOVETYPE_REFLECT; //youken mod bouncing bfg ball
 	//bfg->movetype = MOVETYPE_FLYMISSILE;
 	bfg->clipmask = MASK_SHOT;
 	bfg->solid = SOLID_BBOX;

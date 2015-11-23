@@ -1,14 +1,15 @@
-﻿Build started 11/1/2015 3:53:33 PM.
+﻿Build started 11/23/2015 2:24:56 PM.
      1>Project "D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\src\game.vcxproj" on node 2 (build target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(298,5): warning MSB8004: Intermediate Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Intermediate Directory.
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(299,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
      1>InitializeBuildStatus:
-         Creating ".\debug\game.unsuccessfulbuild" because "AlwaysCreate" was specified.
+         Touching ".\debug\game.unsuccessfulbuild".
        ClCompile:
-         d:\Users\Youken\Program\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D BUILDING_REF_GL /D _VC80_UPGRADE=0x0600 /D _WINDLL /Gm /EHsc /MTd /GS /Gy- /fp:precise /Zc:wchar_t /Zc:forScope /Fo".\debug\\" /Fd".\debug\vc100.pdb" /FR".\debug\\" /Gd /TC /analyze- /errorReport:prompt p_weapon.c
-         p_weapon.c
-     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(990,5): warning MSB8012: TargetPath(D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\src\.\..\debug\game.dll) does not match the Linker's OutputFile property value (D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\debug\gamex86.dll). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+         All outputs are up-to-date.
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(990,5): warning MSB8012: TargetPath(D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\src\..\debug\game.dll) does not match the Linker's OutputFile property value (D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\baseq2\gamex86.dll). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppBuild.targets(992,5): warning MSB8012: TargetName(game) does not match the Linker's OutputFile property value (gamex86). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
        Link:
-         d:\Users\Youken\Program\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"..\debug\gamex86.dll" /INCREMENTAL:NO /NOLOGO winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /DEF:".\game.def" /MANIFEST /ManifestFile:".\debug\game.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\debug\game.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /BASE:"0x20000000" /DYNAMICBASE /NXCOMPAT /IMPLIB:".\..\debug\gamex86.lib" /MACHINE:X86 /DLL .\debug\g_ai.obj
+         d:\Users\Youken\Program\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"..\baseq2\gamex86.dll" /INCREMENTAL:NO /NOLOGO winmm.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /DEF:".\game.def" /MANIFEST /ManifestFile:".\debug\game.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\debug\game.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /BASE:"0x20000000" /DYNAMICBASE /NXCOMPAT /IMPLIB:".\..\debug\gamex86.lib" /MACHINE:X86 /DLL .\debug\g_ai.obj
          .\debug\g_chase.obj
          .\debug\g_cmds.obj
          .\debug\g_combat.obj
@@ -56,18 +57,9 @@
          .\debug\p_view.obj
          .\debug\p_weapon.obj
          .\debug\q_shared.obj
-     1>g_ai.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO' specification
-            Creating library .\..\debug\gamex86.lib and object .\..\debug\gamex86.exp
-         game.vcxproj -> D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\src\.\..\debug\game.dll
-       Manifest:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"..\debug\gamex86.dll;#2" /manifest .\debug\game.dll.intermediate.manifest
-       BscMake:
-         d:\Users\Youken\Program\Microsoft Visual Studio 10.0\VC\bin\bscmake.exe /nologo /o".\..\debug\game.bsc" .\debug\g_ai.sbr .\debug\g_chase.sbr .\debug\g_cmds.sbr .\debug\g_combat.sbr .\debug\g_func.sbr .\debug\g_items.sbr .\debug\g_main.sbr .\debug\g_misc.sbr .\debug\g_monster.sbr .\debug\g_phys.sbr .\debug\g_save.sbr .\debug\g_spawn.sbr .\debug\g_svcmds.sbr .\debug\g_target.sbr .\debug\g_trigger.sbr .\debug\g_turret.sbr .\debug\g_utils.sbr .\debug\g_weapon.sbr .\debug\m_actor.sbr .\debug\m_berserk.sbr .\debug\m_boss2.sbr .\debug\m_boss3.sbr .\debug\m_boss31.sbr .\debug\m_boss32.sbr .\debug\m_brain.sbr .\debug\m_chick.sbr .\debug\m_flash.sbr .\debug\m_flipper.sbr .\debug\m_float.sbr .\debug\m_flyer.sbr .\debug\m_gladiator.sbr .\debug\m_gunner.sbr .\debug\m_hover.sbr .\debug\m_infantry.sbr .\debug\m_insane.sbr .\debug\m_medic.sbr .\debug\m_move.sbr .\debug\m_mutant.sbr .\debug\m_parasite.sbr .\debug\m_soldier.sbr .\debug\m_supertank.sbr .\debug\m_tank.sbr .\debug\p_client.sbr .\debug\p_hud.sbr .\debug\p_trail.sbr .\debug\p_view.sbr .\debug\p_weapon.sbr .\debug\q_shared.sbr
-       FinalizeBuildStatus:
-         Deleting file ".\debug\game.unsuccessfulbuild".
-         Touching ".\debug\game.lastbuildstate".
-     1>Done Building Project "D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\src\game.vcxproj" (build target(s)).
+     1>LINK : fatal error LNK1104: cannot open file '..\baseq2\gamex86.dll'
+     1>Done Building Project "D:\Users\Youken\My Games\Steam\steamapps\common\Quake 2\src\game.vcxproj" (build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:03.31
+Time Elapsed 00:00:00.11
