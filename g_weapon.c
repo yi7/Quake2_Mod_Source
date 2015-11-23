@@ -323,7 +323,7 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 	G_FreeEdict (self);
 }
 
-//youken blaster_think
+//youken fire_blaster_think
 void fire_blaster_think(edict_t *ent)
 {
 	edict_t *target = NULL;
@@ -333,27 +333,36 @@ void fire_blaster_think(edict_t *ent)
 	vec_t speed;
 
 	while( (search=findradius(search,ent->s.origin, 1000)) != NULL ) {
+		//ignore all other entity besides monster and player
 		if( !(search->svflags & SVF_MONSTER) && !search->client )
 			continue;
 		if( search == ent->owner )
 			continue;
+		if( !search->takedamage)
+			continue;
+		if( search->health <= 0 )
+			continue;
 
+		//find monster and player in front and visible to me
 		if( !visible(ent, search) )
 			continue;
 		if( !infront(ent, search) )
 			continue;
 
+		//find the distance of the bolt
 		VectorSubtract(search->s.origin, ent->s.origin, searchdir);
 
-		if( (target=NULL) || (VectorLength(searchdir) < VectorLength(targetdir)) ) {
+		//find target
+		if( (target==NULL) || (VectorLength(searchdir) < VectorLength(targetdir)) ) {
 			target = search;
 			VectorCopy(searchdir,targetdir);
 		}
 	}
 
+	//redirect bolt to target
 	if( target != NULL ) {
 		VectorNormalize(targetdir);
-		VectorScale(targetdir, 0.2, targetdir);
+		VectorScale(targetdir, 0.5, targetdir);
 		VectorAdd(targetdir, ent->movedir, targetdir);
 		VectorNormalize(targetdir);
 		VectorCopy(targetdir, ent->movedir);
@@ -362,6 +371,7 @@ void fire_blaster_think(edict_t *ent)
 		VectorScale(targetdir, speed, ent->velocity);
 	}
 
+	//blaster thinks again
 	ent->nextthink = level.time + .1;
 	return;
 }
@@ -428,6 +438,10 @@ static void Grenade_Explode (edict_t *ent)
 	vec3_t		origin;
 	int			mod;
 
+	//prof mod
+	vec3_t dir;
+	int i;
+
 	if (ent->owner->client)
 		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
 
@@ -476,6 +490,17 @@ static void Grenade_Explode (edict_t *ent)
 	}
 	gi.WritePosition (origin);
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
+
+	//prof mod
+	if(ent->original) {
+		dir[0] = crandom();
+		dir[1] = crandom();
+		dir[2] = random();
+		for( i = 0; i < 5; i++ ) {
+			fire_grenade(ent->owner, ent->s.origin, dir, 20, 100, 2, 100);
+		}
+		//gi.centerprintf(ent, "something");
+	}
 
 	G_FreeEdict (ent);
 }
@@ -527,6 +552,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
 	VectorSet (grenade->avelocity, 300, 300, 300);
 	grenade->movetype = MOVETYPE_BOUNCE;
+	//grenade->movetype = MOVETYPE_FLYMISSILE;
 	grenade->clipmask = MASK_SHOT;
 	grenade->solid = SOLID_BBOX;
 	grenade->s.effects |= EF_GRENADE;
@@ -540,7 +566,7 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "grenade";
-
+	//grenade->original = false;
 	gi.linkentity (grenade);
 }
 
@@ -641,8 +667,55 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 		gi.WriteByte (TE_ROCKET_EXPLOSION);
 	gi.WritePosition (origin);
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
-
+	
 	G_FreeEdict (ent);
+}
+
+//youken mod teleport touch
+void rocket_teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
+{
+	edict_t		*dest;
+	int			i;
+
+	if (!other->client)
+		return;
+	dest = G_Find (NULL, FOFS(targetname), self->target);
+	if (!dest)
+	{
+		gi.dprintf ("Couldn't find destination\n");
+		return;
+	}
+
+	// unlink to make sure it can't possibly interfere with KillBox
+	gi.unlinkentity (other);
+
+	VectorCopy (dest->s.origin, other->s.origin);
+	VectorCopy (dest->s.origin, other->s.old_origin);
+	other->s.origin[2] += 10;
+
+	// clear the velocity and hold them in place briefly
+	VectorClear (other->velocity);
+	other->client->ps.pmove.pm_time = 160>>3;		// hold time
+	other->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
+
+	// draw the teleport splash at source and on the player
+	self->owner->s.event = EV_PLAYER_TELEPORT;
+	other->s.event = EV_PLAYER_TELEPORT;
+
+	// set angles
+	for (i=0 ; i<3 ; i++)
+	{
+		other->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(dest->s.angles[i] - other->client->resp.cmd_angles[i]);
+	}
+
+	VectorClear (other->s.angles);
+	VectorClear (other->client->ps.viewangles);
+	VectorClear (other->client->v_angle);
+
+	// kill anything at the destination
+	KillBox (other);
+
+	gi.linkentity (other);
 }
 
 void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
@@ -654,7 +727,9 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	VectorCopy (dir, rocket->movedir);
 	vectoangles (dir, rocket->s.angles);
 	VectorScale (dir, speed, rocket->velocity);
-	rocket->movetype = MOVETYPE_FLYMISSILE;
+	rocket->movetype = MOVETYPE_FLYMISSILE | MOVETYPE_BOUNCE;
+	//youken mod
+	//rocket->movetype = MOVETYPE_BOUNCE;
 	rocket->clipmask = MASK_SHOT;
 	rocket->solid = SOLID_BBOX;
 	rocket->s.effects |= EF_ROCKET;
@@ -663,6 +738,7 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	rocket->owner = self;
 	rocket->touch = rocket_touch;
+	//rocket->touch = rocket_teleporter_touch;
 	rocket->nextthink = level.time + 8000/speed;
 	rocket->think = G_FreeEdict;
 	rocket->dmg = damage;

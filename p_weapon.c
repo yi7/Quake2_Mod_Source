@@ -812,7 +812,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 
 	fire_blaster (ent, start, forward, damage, 700, effect, hyper);
 
-	//youken edit
+	//youken shoot two bolts
 	VectorSet(offset, 24, -8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 	fire_blaster (ent, start, forward, damage, 700, effect, hyper);
