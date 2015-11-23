@@ -492,7 +492,7 @@ static void Grenade_Explode (edict_t *ent)
 	gi.multicast (ent->s.origin, MULTICAST_PHS);
 
 	//prof mod
-	if(ent->original) {
+	/*if(ent->original) {
 		dir[0] = crandom();
 		dir[1] = crandom();
 		dir[2] = random();
@@ -500,10 +500,43 @@ static void Grenade_Explode (edict_t *ent)
 			fire_grenade(ent->owner, ent->s.origin, dir, 20, 100, 2, 100);
 		}
 		//gi.centerprintf(ent, "something");
-	}
+	}*/
 
 	G_FreeEdict (ent);
 }
+
+//youken mine mod start
+static void Mine_Explode (edict_t *ent)
+{
+	edict_t *target = NULL;
+
+	if(level.time > ent->delay) {
+		Grenade_Explode(ent);
+		return;
+	}
+
+	ent->think = Mine_Explode;
+
+	//Explode mine depending on entity that steps on it
+	while( (target = findradius(target, ent->s.origin,100)) != NULL ) {
+		if(!(target->svflags & SVF_MONSTER) && !target->client)
+			continue;
+		if(target == ent->owner)
+			continue;
+		if(!target->takedamage)
+			continue;
+		if(target->health <= 0)
+			continue;
+		if(!visible(ent,target))
+			continue;
+
+		ent->think = Grenade_Explode;
+		break;
+	}
+
+	ent->nextthink = level.time + .1;
+}
+//youken mine mod end
 
 static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
@@ -552,7 +585,6 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	VectorMA (grenade->velocity, crandom() * 10.0, right, grenade->velocity);
 	VectorSet (grenade->avelocity, 300, 300, 300);
 	grenade->movetype = MOVETYPE_BOUNCE;
-	//grenade->movetype = MOVETYPE_FLYMISSILE;
 	grenade->clipmask = MASK_SHOT;
 	grenade->solid = SOLID_BBOX;
 	grenade->s.effects |= EF_GRENADE;
@@ -594,8 +626,13 @@ void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int 
 	grenade->s.modelindex = gi.modelindex ("models/objects/grenade2/tris.md2");
 	grenade->owner = self;
 	grenade->touch = Grenade_Touch;
-	grenade->nextthink = level.time + timer;
-	grenade->think = Grenade_Explode;
+
+	//youken mine mod start
+	grenade->nextthink = level.time + .1;
+	grenade->think = Mine_Explode;
+	grenade->delay = level.time + 60;
+	//youken mine mod end
+
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
 	grenade->classname = "hgrenade";
