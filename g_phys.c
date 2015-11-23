@@ -683,7 +683,8 @@ void SV_Physics_Toss (edict_t *ent)
 
 // add gravity
 	if (ent->movetype != MOVETYPE_FLY
-	&& ent->movetype != MOVETYPE_FLYMISSILE)
+	&& ent->movetype != MOVETYPE_FLYMISSILE
+	&& ent->movetype != MOVETYPE_REFLECT) //youken mod bounce
 		SV_AddGravity (ent);
 
 // move angles
@@ -702,10 +703,21 @@ void SV_Physics_Toss (edict_t *ent)
 		else
 			backoff = 1;
 
+		//youken mod bounce start
+		if (ent->movetype == MOVETYPE_REFLECT)
+			backoff = 3;
+		//youken mod bounce end
+
 		ClipVelocity (ent->velocity, trace.plane.normal, ent->velocity, backoff);
 
+		//youken mod bounce start
+		if (ent->movetype == MOVETYPE_REFLECT) {
+			vectoangles (ent->velocity, ent->s.angles);
+		}
+		//youken mod bounce end
+
 	// stop if on ground
-		if (trace.plane.normal[2] > 0.7)
+		if (trace.plane.normal[2] > 0.7 && ent->movetype != MOVETYPE_REFLECT) //youken mod bounce
 		{		
 			if (ent->velocity[2] < 60 || ent->movetype != MOVETYPE_BOUNCE )
 			{
@@ -934,6 +946,7 @@ void G_RunEntity (edict_t *ent)
 	case MOVETYPE_BOUNCE:
 	case MOVETYPE_FLY:
 	case MOVETYPE_FLYMISSILE:
+	case MOVETYPE_REFLECT:
 		SV_Physics_Toss (ent);
 		break;
 	default:
