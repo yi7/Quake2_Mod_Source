@@ -683,6 +683,7 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 	}
 	else
 	{
+		return; //youken mod bounce rocket
 		// don't throw any debris in net games
 		if (!deathmatch->value && !coop->value)
 		{
@@ -764,7 +765,8 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	VectorCopy (dir, rocket->movedir);
 	vectoangles (dir, rocket->s.angles);
 	VectorScale (dir, speed, rocket->velocity);
-	rocket->movetype = MOVETYPE_FLYMISSILE;
+	//rocket->movetype = MOVETYPE_FLYMISSILE;
+	rocket->movetype = MOVETYPE_REFLECT; //youken mod bounce rocket
 	rocket->clipmask = MASK_SHOT;
 	rocket->solid = SOLID_BBOX;
 	rocket->s.effects |= EF_ROCKET;
