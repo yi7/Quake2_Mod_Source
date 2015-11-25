@@ -824,6 +824,9 @@ typedef struct
 	int			max_health;
 	int			savedFlags;
 
+	//youken mod energy
+	float		energy;
+
 	int			selected_item;
 	int			inventory[MAX_ITEMS];
 
@@ -1095,5 +1098,6 @@ struct edict_s
 
 	//prof mod
 	int original;
+	int crazyjumping;
 };
 

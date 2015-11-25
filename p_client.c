@@ -608,6 +608,9 @@ void InitClientPersistant (gclient_t *client)
 	client->pers.max_cells		= 200;
 	client->pers.max_slugs		= 50;
 
+	//youken energy mod
+	client->pers.energy			= 500;
+
 	client->pers.connected = true;
 }
 
@@ -1566,6 +1569,8 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	int		i, j;
 	pmove_t	pm;
 
+	//gi.centerprintf(ent, "something");
+
 	level.current_entity = ent;
 	client = ent->client;
 
@@ -1591,6 +1596,18 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 		// set up for pmove
 		memset (&pm, 0, sizeof(pm));
+
+		//youken mod energy jump
+		/*if(ent->crazyjumping) {
+			ent->velocity[2] += 50;
+			if(ent->velocity[2] >= 300)
+				ent->velocity[2] = 300;
+		}*/
+		gi.centerprintf(ent, "vel[2]: %f/n",ent->velocity[2]);
+
+		//youken mod energy regen
+		if(client->pers.energy <= 500 )
+			client->pers.energy += 0.05;
 
 		if (ent->movetype == MOVETYPE_NOCLIP)
 			client->ps.pmove.pm_type = PM_SPECTATOR;

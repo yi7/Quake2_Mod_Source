@@ -412,7 +412,10 @@ void G_SetStats (edict_t *ent)
 	else
 	{
 		ent->client->ps.stats[STAT_ARMOR_ICON] = 0;
-		ent->client->ps.stats[STAT_ARMOR] = 0;
+
+		//youken mod energy
+		//couldn't figure out where hnum comes from in hud so used the armor rnum as energy
+		ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.energy;
 	}
 
 	//

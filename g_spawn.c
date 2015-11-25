@@ -635,6 +635,12 @@ char *single_statusbar =
 "xv	50 "
 "pic 0 "
 
+//youken mod energy
+"xv	-250 "
+"rnum "
+"xv	-200 "
+"pic 0 "
+
 // ammo
 "if 2 "
 "	xv	100 "
@@ -691,6 +697,12 @@ char *dm_statusbar =
 "xv	0 "
 "hnum "
 "xv	50 "
+"pic 0 "
+
+//youken mod energy
+"xv	-250 "
+"rnum "
+"xv	-200 "
 "pic 0 "
 
 // ammo
