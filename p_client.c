@@ -1603,7 +1603,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			if(ent->velocity[2] >= 300)
 				ent->velocity[2] = 300;
 		}*/
-		gi.centerprintf(ent, "vel[2]: %f/n",ent->velocity[2]);
+		//gi.centerprintf(ent, "vel[2]: %f/n",ent->velocity[2]);
 
 		//youken mod energy regen
 		if(client->pers.energy <= 500 )

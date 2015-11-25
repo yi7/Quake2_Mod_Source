@@ -1,5 +1,6 @@
 #include "g_local.h"
 #include "m_player.h"
+#include "laser.h"
 
 
 char *ClientTeam (edict_t *ent)
@@ -880,23 +881,30 @@ void Cmd_PlayerList_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }
 
+//youken mod multi jump
 void CrazyJump(edict_t *ent)
 {
-	if( (!ent->crazyjumping) ) {
-		ent->crazyjumping = 1;
-
-		if(ent->client->pers.energy >= 0) {
-			if(ent->client->pers.energy > 20) {
-				ent->client->pers.energy -= 20;
-				ent->velocity[2] += 500;
-				gi.centerprintf(ent, "vel[2]: %f/n",ent->velocity[2]);
-			}
-		} else {
-			ent->client->pers.energy = 0;
+	if(ent->client->pers.energy >= 0) {
+		if(ent->client->pers.energy > 50) {
+			ent->client->pers.energy -= 50;
+			ent->velocity[2] += 500;
+			//gi.centerprintf(ent, "vel[2]: %f/n",ent->velocity[1]);
 		}
-
 	} else {
-		ent->crazyjumping = 0;
+		ent->client->pers.energy = 0;
+	}
+}
+
+//youken mod laser
+void Laser(edict_t *ent)
+{
+	if(ent->client->pers.energy >= 0) {
+		if(ent->client->pers.energy > 100) {
+			ent->client->pers.energy -= 100;
+			PlaceLaser(ent);
+		}
+	} else {
+		ent->client->pers.energy = 0;
 	}
 }
 
@@ -990,6 +998,8 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "crazyjump") == 0)
 		CrazyJump(ent);
+	else if (Q_stricmp(cmd, "laser") == 0)
+		Laser(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }

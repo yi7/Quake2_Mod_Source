@@ -1,4 +1,5 @@
 #include "g_local.h"
+#include "laser.h"
 
 /*QUAKED target_temp_entity (1 0 0) (-8 -8 -8) (8 8 8)
 Fire an origin based temp entity event to the clients.
@@ -482,6 +483,27 @@ void target_laser_think (edict_t *self)
 	vec3_t	point;
 	vec3_t	last_movedir;
 	int		count;
+
+	if (strcmp(self->classname,"laser_yaya") == 0)
+	{
+		if (level.time > self -> delay)
+		{
+			// bit of damage
+			T_RadiusDamage (self, self, LASER_MOUNT_DAMAGE, NULL, LASER_MOUNT_DAMAGE_RADIUS, NULL, 0 );
+			gi.centerprintf(self,"something");
+
+			// BANG !
+			gi.WriteByte (svc_temp_entity);
+			gi.WriteByte (TE_EXPLOSION1);
+			gi.WritePosition(self -> s.origin);
+			gi.multicast (self->s.origin, MULTICAST_PVS);
+
+			// bye bye laser
+			G_FreeEdict (self);
+
+			return;
+		}
+	}
 
 	if (self->spawnflags & 0x80000000)
 		count = 8;
