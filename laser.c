@@ -21,9 +21,9 @@ void PlaceLaser (edict_t *ent)
 	   return;
 
 	// cells for laser ?
-	if (ent->client->pers.inventory[ITEM_INDEX(FindItem("Cells"))] < CELLS_FOR_LASER)
+	if (ent->client->pers.energy < ENERGY_FOR_LASER)
 	{
- 		gi.cprintf(ent, PRINT_HIGH, "Not enough cells for laser.\n");
+ 		gi.cprintf(ent, PRINT_HIGH, "Not enough energy for laser.\n");
 		return;
 	}
 
@@ -55,8 +55,6 @@ void PlaceLaser (edict_t *ent)
 
 	// Ok, lets stick one on then ...
 	gi.cprintf (ent, PRINT_HIGH, "Laser attached.\n");
-
-	ent->client->pers.inventory[ITEM_INDEX(FindItem("Cells"))] -= CELLS_FOR_LASER;
 
 	// -----------
 	// Setup laser

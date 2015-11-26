@@ -710,50 +710,63 @@ void rocket_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *su
 }
 
 //youken mod teleport touch
-void rocket_teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
+void rocket_teleporter_touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
-	edict_t		*dest;
-	int			i;
+	edict_t		*owner;
+	vec3_t		stepback, stepfoward, destination;
+	vec_t scale;
+	int			n, i;
 
-	if (!other->client)
+	owner = ent->owner;
+
+	if (other == ent->owner)
 		return;
-	dest = G_Find (NULL, FOFS(targetname), self->target);
-	if (!dest)
+
+	if (surf && (surf->flags & SURF_SKY))
 	{
-		gi.dprintf ("Couldn't find destination\n");
+		G_FreeEdict (ent);
 		return;
 	}
 
-	// unlink to make sure it can't possibly interfere with KillBox
-	gi.unlinkentity (other);
+	VectorSubtract(ent->s.origin,ent->owner->s.origin,stepback);
+	VectorMA(ent->owner->s.origin,0.85,stepback,destination);
 
-	VectorCopy (dest->s.origin, other->s.origin);
-	VectorCopy (dest->s.origin, other->s.old_origin);
-	other->s.origin[2] += 10;
+	VectorCopy (destination, owner->client->teleport_origin);
+	VectorCopy (ent->s.angles, owner->client->teleport_angles);
+	G_FreeEdict (ent);
+
+	gi.WriteByte (svc_temp_entity);
+	gi.WriteByte (TE_BOSSTPORT);
+	gi.WritePosition (owner->s.origin);
+	gi.multicast (owner->s.origin, MULTICAST_PVS);
+
+	// unlink to make sure it can't possibly interfere with KillBox
+	gi.unlinkentity (owner);
+	
+	VectorCopy (owner->client->teleport_origin, owner->s.origin);
+	VectorCopy (owner->client->teleport_origin, owner->s.old_origin);
+	owner->s.origin[2] += 10;
 
 	// clear the velocity and hold them in place briefly
-	VectorClear (other->velocity);
-	other->client->ps.pmove.pm_time = 160>>3;		// hold time
-	other->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
+	VectorClear (owner->velocity);
+	owner->client->ps.pmove.pm_time = 160>>3;		// hold time
+	owner->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
 
-	// draw the teleport splash at source and on the player
-	self->owner->s.event = EV_PLAYER_TELEPORT;
-	other->s.event = EV_PLAYER_TELEPORT;
+	// draw the teleport splash on the player
+	owner->s.event = EV_PLAYER_TELEPORT;
 
 	// set angles
 	for (i=0 ; i<3 ; i++)
-	{
-		other->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(dest->s.angles[i] - other->client->resp.cmd_angles[i]);
-	}
+		owner->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(owner->client->teleport_angles[i] - owner->client->resp.cmd_angles[i]);
 
-	VectorClear (other->s.angles);
-	VectorClear (other->client->ps.viewangles);
-	VectorClear (other->client->v_angle);
+	VectorClear (owner->s.angles);
+	VectorClear (owner->client->ps.viewangles);
+	VectorClear (owner->client->v_angle);
 
 	// kill anything at the destination
-	KillBox (other);
+	KillBox (owner);
 
-	gi.linkentity (other);
+	gi.linkentity (owner);
 }
 
 void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage)
@@ -765,8 +778,8 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	VectorCopy (dir, rocket->movedir);
 	vectoangles (dir, rocket->s.angles);
 	VectorScale (dir, speed, rocket->velocity);
-	//rocket->movetype = MOVETYPE_FLYMISSILE;
-	rocket->movetype = MOVETYPE_REFLECT; //youken mod bounce rocket
+	rocket->movetype = MOVETYPE_FLYMISSILE;
+	//rocket->movetype = MOVETYPE_REFLECT; //youken mod bounce rocket
 	rocket->clipmask = MASK_SHOT;
 	rocket->solid = SOLID_BBOX;
 	rocket->s.effects |= EF_ROCKET;
@@ -774,8 +787,8 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	VectorClear (rocket->maxs);
 	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	rocket->owner = self;
-	rocket->touch = rocket_touch;
-	//rocket->touch = rocket_teleporter_touch;
+	//rocket->touch = rocket_touch;
+	rocket->touch = rocket_teleporter_touch;
 	rocket->nextthink = level.time + 8000/speed;
 	rocket->think = G_FreeEdict;
 	rocket->dmg = damage;

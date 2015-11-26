@@ -900,8 +900,8 @@ void Laser(edict_t *ent)
 {
 	if(ent->client->pers.energy >= 0) {
 		if(ent->client->pers.energy > 100) {
-			ent->client->pers.energy -= 100;
 			PlaceLaser(ent);
+			ent->client->pers.energy -= 100;
 		}
 	} else {
 		ent->client->pers.energy = 0;

@@ -945,6 +945,10 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+
+	//youken mod teleport
+	vec3_t teleport_angles;
+	vec3_t teleport_origin;
 };
 
 
