@@ -949,6 +949,9 @@ struct gclient_s
 	//youken mod teleport
 	vec3_t teleport_angles;
 	vec3_t teleport_origin;
+
+	//youken mod decoy
+	int decoynum;
 };
 
 
@@ -1103,5 +1106,9 @@ struct edict_s
 	//prof mod
 	int original;
 	int crazyjumping;
+
+	//youken decoy mod
+	edict_t *decoy;
+	int decoyNum;
 };
 

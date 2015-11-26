@@ -885,8 +885,8 @@ void Cmd_PlayerList_f(edict_t *ent)
 void CrazyJump(edict_t *ent)
 {
 	if(ent->client->pers.energy >= 0) {
-		if(ent->client->pers.energy > 50) {
-			ent->client->pers.energy -= 50;
+		if(ent->client->pers.energy > 100) {
+			ent->client->pers.energy -= 100;
 			ent->velocity[2] += 500;
 			//gi.centerprintf(ent, "vel[2]: %f/n",ent->velocity[1]);
 		}
@@ -908,6 +908,18 @@ void Laser(edict_t *ent)
 	}
 }
 
+void SP_Decoy(edict_t *self);
+void Decoy(edict_t *ent)
+{
+	if(ent->client->pers.energy >= 0) {
+		if(ent->client->pers.energy > 100) {
+			SP_Decoy(ent);
+			ent->client->pers.energy -= 100;
+		}
+	} else {
+		ent->client->pers.energy = 0;
+	}
+}
 
 /*
 =================
@@ -1000,6 +1012,8 @@ void ClientCommand (edict_t *ent)
 		CrazyJump(ent);
 	else if (Q_stricmp(cmd, "laser") == 0)
 		Laser(ent);
+	else if (Q_stricmp(cmd, "decoy") == 0)
+		Decoy(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
