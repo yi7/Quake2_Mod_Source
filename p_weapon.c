@@ -1290,25 +1290,36 @@ void weapon_railgun_fire (edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
-	int			damage;
 	int			kick;
 
-	if (deathmatch->value)
-	{	// normal damage is too extreme in dm
-		damage = 100;
-		kick = 200;
+	//youken mod charge railgun start
+	if (ent->client->buttons & BUTTON_ATTACK) {
+		ent->chargeDamage += 10;
+		if (ent->chargeDamage < 250 )
+			gi.cprintf(ent->owner, PRINT_HIGH, "Charge: %d\n", ent->chargeDamage);
+		else
+			gi.cprintf(ent->owner, PRINT_HIGH, "Charge: MAX\n");
+
+		if (ent->chargeDamage>250)
+			ent->chargeDamage= 250;	
+		if (ent->chargeDamage == 240)	
+			gi.sound( ent, CHAN_WEAPON, gi.soundindex("misc/comp_up.wav"), 1, ATTN_NONE, 0 );
+		return;
 	}
-	else
-	{
-		damage = 150;
-		kick = 250;
+	if (ent->chargeDamage == 0) {		
+		ent->chargeDamage = 1;
+		return;
 	}
+	
+	if (ent->chargeDamage<70)
+		ent->chargeDamage= 70;
 
 	if (is_quad)
 	{
-		damage *= 4;
+		ent->chargeDamage *= 4;
 		kick *= 4;
 	}
+	//youken mod charge railgun end
 
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
@@ -1317,7 +1328,7 @@ void weapon_railgun_fire (edict_t *ent)
 
 	VectorSet(offset, 0, 7,  ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rail (ent, start, forward, damage, kick);
+	fire_rail (ent, start, forward, ent->chargeDamage, kick);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1330,6 +1341,9 @@ void weapon_railgun_fire (edict_t *ent)
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index]--;
+
+	//youken mod charge railgun
+	ent->chargeDamage = 0;
 }
 
 

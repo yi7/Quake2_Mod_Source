@@ -1111,5 +1111,8 @@ struct edict_s
 
 	//youken decoy mod
 	edict_t *decoy;
+
+	//youken charge railgun mod
+	int chargeDamage;
 };
 

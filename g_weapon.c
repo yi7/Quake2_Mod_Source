@@ -1117,6 +1117,12 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	bfg->nextthink = level.time + 8000/speed;
 	bfg->think = G_FreeEdict;
 	bfg->radius_dmg = damage;
+
+
+
+
+
+
 	bfg->dmg_radius = damage_radius;
 	bfg->classname = "bfg blast";
 	bfg->s.sound = gi.soundindex ("weapons/bfg__l1a.wav");
