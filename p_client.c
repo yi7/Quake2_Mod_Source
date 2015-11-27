@@ -1216,6 +1216,10 @@ void PutClientInServer (edict_t *ent)
 	VectorCopy (ent->s.angles, client->ps.viewangles);
 	VectorCopy (ent->s.angles, client->v_angle);
 
+	//youken mod flash grenade
+	client->blindBase = 0;
+	client->blindTime = 0;
+
 	// spawn a spectator
 	if (client->pers.spectator) {
 		client->chase_target = NULL;
@@ -1597,13 +1601,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		// set up for pmove
 		memset (&pm, 0, sizeof(pm));
 
-		//youken mod energy jump
-		/*if(ent->crazyjumping) {
-			ent->velocity[2] += 50;
-			if(ent->velocity[2] >= 300)
-				ent->velocity[2] = 300;
-		}*/
-		//gi.centerprintf(ent, "vel[2]: %f/n",ent->velocity[2]);
+		//youken mod flash grenade
+		if(client->blindTime > 0)
+			client->blindTime -= 0.1;
+		else
+			client->blindTime = 0;
 
 		//youken mod energy regen
 		if(client->pers.energy <= 500 )

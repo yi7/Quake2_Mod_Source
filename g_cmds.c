@@ -885,8 +885,8 @@ void Cmd_PlayerList_f(edict_t *ent)
 void CrazyJump(edict_t *ent)
 {
 	if(ent->client->pers.energy >= 0) {
-		if(ent->client->pers.energy > 100) {
-			ent->client->pers.energy -= 100;
+		if(ent->client->pers.energy > 50) {
+			ent->client->pers.energy -= 50;
 			ent->velocity[2] += 500;
 			//gi.centerprintf(ent, "vel[2]: %f/n",ent->velocity[1]);
 		}
@@ -899,9 +899,9 @@ void CrazyJump(edict_t *ent)
 void Laser(edict_t *ent)
 {
 	if(ent->client->pers.energy >= 0) {
-		if(ent->client->pers.energy > 100) {
+		if(ent->client->pers.energy > 50) {
 			PlaceLaser(ent);
-			ent->client->pers.energy -= 100;
+			ent->client->pers.energy -= 50;
 		}
 	} else {
 		ent->client->pers.energy = 0;
@@ -912,9 +912,9 @@ void SP_Decoy(edict_t *self);
 void Decoy(edict_t *ent)
 {
 	if(ent->client->pers.energy >= 0) {
-		if(ent->client->pers.energy > 100) {
+		if(ent->client->pers.energy > 20) {
 			SP_Decoy(ent);
-			ent->client->pers.energy -= 100;
+			ent->client->pers.energy -= 20;
 		}
 	} else {
 		ent->client->pers.energy = 0;

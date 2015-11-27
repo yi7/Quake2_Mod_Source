@@ -419,6 +419,15 @@ void SV_CalcBlend (edict_t *ent)
 		SV_AddBlend (0.0, 0.1, 0.05, 0.6, ent->client->ps.blend);
 	else if (contents & CONTENTS_WATER)
 		SV_AddBlend (0.5, 0.3, 0.2, 0.4, ent->client->ps.blend);
+	
+	//youken mod flash grenade
+	if (ent->client->blindTime > 0)
+    {
+        float alpha = ent->client->blindTime / ent->client->blindBase;
+        if (alpha > 1)
+            alpha = 1;
+        SV_AddBlend (1, 1, 1, alpha, ent->client->ps.blend);
+    }
 
 	// add for powerups
 	if (ent->client->quad_framenum > level.framenum)

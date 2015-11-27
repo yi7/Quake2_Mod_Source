@@ -538,6 +538,51 @@ static void Mine_Explode (edict_t *ent)
 }
 //youken mine mod end
 
+//youken mod flash grenade
+#define         FLASH_RADIUS                    200
+#define         BLIND_FLASH                     50      // Time of blindness in FRAMES      
+void Flash_Explode (edict_t *ent)
+{
+    vec3_t offset, origin, v;
+    edict_t *target;
+	float Distance, BlindTimeAdd;
+
+    // Move it off the ground so people are sure to see it
+    VectorSet(offset, 0, 0, 10);    
+    VectorAdd(ent->s.origin, offset, ent->s.origin);
+
+    if (ent->owner->client)
+        PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
+
+    target = NULL;
+    while ((target = findradius(target, ent->s.origin, FLASH_RADIUS)) != NULL)
+    {
+        if (!target->client)
+            continue;       // It's not a player
+        if (!visible(ent, target))
+            continue;       // The grenade can't see it
+        if (!infront(target, ent))
+            continue;       // It's not facing it
+
+        // Increment the blindness counter
+        target->client->blindTime += BLIND_FLASH * 1.5;
+        target->client->blindBase = BLIND_FLASH;
+
+        // Let the player know what just happened
+        // (It's just as well, he won't see the message immediately!)
+        gi.cprintf(target, PRINT_HIGH, 
+            "You are blinded by a flash grenade!!!\n");
+
+        // Let the owner of the grenade know it worked
+        gi.cprintf(ent->owner, PRINT_HIGH, 
+            "%s is blinded by your flash grenade!\n",
+            target->client->pers.netname);
+    }
+
+    // Blow up the grenade
+    BecomeExplosion1(ent);
+}
+
 static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf)
 {
 	if (other == ent->owner)
@@ -566,7 +611,7 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	}
 
 	ent->enemy = other;
-	Grenade_Explode (ent);
+	Flash_Explode (ent);
 }
 
 void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius)
@@ -597,7 +642,19 @@ void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 	grenade->think = Grenade_Explode;
 	grenade->dmg = damage;
 	grenade->dmg_radius = damage_radius;
-	grenade->classname = "grenade";
+
+	//youken mod flash grenade
+	if(self->client) {
+		grenade->touch = Grenade_Touch;
+		grenade->think = Flash_Explode;
+		grenade->classname = "flash_grenade";
+	} else {
+		grenade->classname = "grenade";
+	}
+    
+
+	//grenade->classname = "grenade";
+	
 	//grenade->original = false;
 	gi.linkentity (grenade);
 }

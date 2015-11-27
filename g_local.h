@@ -952,8 +952,10 @@ struct gclient_s
 
 	//youken mod decoy
 	int decoynum;
-};
 
+	//youken mod flash grenade
+	float blindTime, blindBase;
+};
 
 struct edict_s
 {
@@ -1109,6 +1111,5 @@ struct edict_s
 
 	//youken decoy mod
 	edict_t *decoy;
-	int decoyNum;
 };
 
