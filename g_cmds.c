@@ -922,6 +922,81 @@ void Decoy(edict_t *ent)
 }
 
 /*
+==================
+Cmd_Store_Teleport_f
+==================
+*/
+void Cmd_Store_Teleport_f (edict_t *ent)
+{
+	VectorCopy (ent->s.origin, ent->client->tele_origin);
+	VectorCopy (ent->s.angles, ent->client->tele_angles);
+
+	ent->client->teleport_stored = true;
+
+	gi.centerprintf (ent, "Teleport Location Stored!\n");
+}
+
+/*
+==================
+Cmd_Load_Teleport_f
+==================
+*/
+void Cmd_Load_Teleport_f (edict_t *ent)
+{
+	int		i;
+
+	if (ent->client->teleport_stored) {
+
+		if(ent->client->pers.energy >= 0) {
+
+			if(ent->client->pers.energy > 100) {
+
+				gi.WriteByte (svc_temp_entity);
+
+				gi.WriteByte (TE_BOSSTPORT);
+				gi.WritePosition (ent->s.origin);
+				gi.multicast (ent->s.origin, MULTICAST_PVS);
+
+				// unlink to make sure it can't possibly interfere with KillBox
+				gi.unlinkentity (ent);
+
+				VectorCopy (ent->client->tele_origin, ent->s.origin);
+				VectorCopy (ent->client->tele_origin, ent->s.old_origin);
+				ent->s.origin[2] += 10;
+
+				// clear the velocity and hold them in place briefly
+				VectorClear (ent->velocity);
+				ent->client->ps.pmove.pm_time = 160>>3;		// hold time
+				ent->client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
+
+				// draw the teleport splash on the player
+				ent->s.event = EV_PLAYER_TELEPORT;
+
+				// set angles
+				for (i=0 ; i<3 ; i++)
+					ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(ent->client->tele_angles[i] - ent->client->resp.cmd_angles[i]);
+
+				VectorClear (ent->s.angles);
+				VectorClear (ent->client->ps.viewangles);
+				VectorClear (ent->client->v_angle);
+
+				// kill anything at the destination
+				KillBox (ent);
+
+				gi.linkentity (ent);
+
+				ent->client->pers.energy -= 100;
+			} else {
+				gi.centerprintf (ent, "Not enough energy\n");
+				ent->client->pers.energy = 0;
+			}
+		}
+	} else {
+		gi.centerprintf (ent, "You don't have a location stored\n");
+	}
+}
+
+/*
 =================
 ClientCommand
 =================
@@ -1014,6 +1089,10 @@ void ClientCommand (edict_t *ent)
 		Laser(ent);
 	else if (Q_stricmp(cmd, "decoy") == 0)
 		Decoy(ent);
+	else if (Q_stricmp (cmd, "storeteleport") == 0)
+		Cmd_Store_Teleport_f (ent);
+	else if (Q_stricmp (cmd, "loadteleport") == 0)
+		Cmd_Load_Teleport_f (ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
